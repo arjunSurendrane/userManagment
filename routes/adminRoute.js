@@ -1,4 +1,5 @@
 var express = require('express');
+const { adminlogin, adminRegister, isAdmin } = require('../Controller/adminAuthController');
 const { searchUser, editUser, deleteUser, createUser, showUsers } = require('../Controller/adminController');
 var router = express.Router();
 
@@ -7,7 +8,11 @@ router.get('/', function (req, res, next) {
   res.send('respond with a resource');
 });
 
+router.route('/reg').post(adminRegister)
 
+router.route('/login').post(adminlogin)
+
+router.use(isAdmin)
 
 router.route('/searchUser').get(searchUser)
 

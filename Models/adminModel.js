@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcryptjs')
 
 
 const adminSchema = new mongoose.Schema({
@@ -15,6 +16,16 @@ const adminSchema = new mongoose.Schema({
         select: false
     }
 })
+
+adminSchema.pre('save', async function (next) {
+    this.password = await bcrypt.hash(this.password, 8)
+    next()
+})
+
+
+adminSchema.methods.comparePassword = async function (inpPassword, password) {
+    return await bcrypt.compare(inpPassword, password)
+}
 
 
 const Admin = mongoose.model('Admin', adminSchema)

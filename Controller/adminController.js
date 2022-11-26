@@ -42,7 +42,6 @@ exports.deleteUser = async (req, res) => {
 //================ CREATE USER ================
 exports.createUser = async (req, res) => {
     try {
-        console.log(req.body);
         const user = await User.create(req.body);
         response("user created", user, 200, res);
     } catch (error) {
@@ -61,5 +60,6 @@ exports.createUser = async (req, res) => {
 //=============== SHOW USERS ==============
 exports.showUsers = async (req, res) => {
     const user = await User.find()
+    console.log(req.admin)
     response('users', user, 200, res)
 }
