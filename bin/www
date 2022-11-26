@@ -11,6 +11,8 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 dotenv.config({ path: './config.env' })
 
+
+
 const db = process.env.DATABASE_KEY
 
 mongoose.connect(db).then(() => {
@@ -23,6 +25,7 @@ mongoose.connect(db).then(() => {
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+
 
 /**
  * Create HTTP server.

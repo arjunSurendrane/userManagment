@@ -36,7 +36,8 @@ const createAndSendToken = async (msg, user, res) => {
     res.cookie('userJwt', token, cookieOption)
     res.json(
         {
-            status: msg,
+            status: 'success',
+            message: msg,
             user
         }
     )
@@ -47,6 +48,7 @@ const createAndSendToken = async (msg, user, res) => {
 //=============== CREATE USER =================
 exports.register = async (req, res) => {
     try {
+        console.log(req.body)
         const user = await User.create(req.body);
         createAndSendToken('new user', user, res)
         //  response("user created", user, 200, res);
