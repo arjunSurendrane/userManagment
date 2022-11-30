@@ -1,3 +1,4 @@
+const IncuForm = require('../Models/incubulationModel')
 const User = require('../Models/userModel')
 const response = require('./response')
 
@@ -59,7 +60,59 @@ exports.createUser = async (req, res) => {
 
 //=============== SHOW USERS ==============
 exports.showUsers = async (req, res) => {
+    console.log(req.body)
+    console.log('haii')
     const user = await User.find()
     console.log(req.admin)
     response('users', user, 200, res)
+}
+
+
+
+//==========UPDATE FORM STATUS =============
+exports.approveRequest = async (req, res) => {
+    try {
+
+        const ChangeStatus = await IncuForm.findByIdAndUpdate(req.params.id, { status: 'Approved' }, { new: true })
+        res.json({
+            Incubulation: ChangeStatus
+        })
+
+
+    } catch (err) {
+        res.json({
+            error: err
+        })
+    }
+}
+
+
+//==============ADD SLOT ==================
+exports.addSlot = async (req, res) => {
+    try {
+        console.log(req.body)
+        const addSlot = await IncuForm.findByIdAndUpdate(req.params.id, { status: 'Booked', BookingDate: req.body.Date }, { new: true, upsert: true })
+        res.json({
+            Incubulation: addSlot
+        })
+    } catch (err) {
+        res.json({
+            error: err
+        })
+    }
+}
+
+
+exports.incuDetails = async (req, res) => {
+    try {
+        const incubation = await IncuForm.find().populate('userId')
+        res.json({
+            incubation
+        })
+    } catch (error) {
+        res.json({
+            error
+        })
+
+    }
 }

@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const IncuForm = require("../Models/incubulationModel");
 const User = require("../Models/userModel");
 const response = require('./response')
 
@@ -7,11 +8,16 @@ const response = require('./response')
 
 exports.isUser = async (req, res, next) => {
     try {
-        if (!req.cookies.userJwt) return next();
-        const decoded = await jwt.verify(req.cookies.userJwt, process.env.SECRET_CODE)
-        if (!decoded.id) return next();
+        let token
+
+        if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+            token = req.headers.authorization.split(' ')[1]
+        }
+        const decoded = jwt.verify(token, process.env.SECRET_CODE)
+        console.log(decoded)
+        if (!decoded.id) return next()
         const user = await User.findById(decoded.id)
-        if (!user) return next();
+        if (!user) return next()
         req.user = user
         next()
 
@@ -22,8 +28,12 @@ exports.isUser = async (req, res, next) => {
 }
 
 
+
+
+
 //=============== CREATE AND SEND TOKEN ================
 const createAndSendToken = async (msg, user, res) => {
+    console.log(user._id)
     const token = await jwt.sign({ id: user._id }, process.env.SECRET_CODE, {
         expiresIn: process.env.EXPIRES_IN
     })
@@ -38,7 +48,8 @@ const createAndSendToken = async (msg, user, res) => {
         {
             status: 'success',
             message: msg,
-            user
+            user,
+            token
         }
     )
 
@@ -60,13 +71,14 @@ exports.register = async (req, res) => {
 //==================== USER LOGIN =======================
 exports.userlogin = async (req, res) => {
     try {
+        console.log(req.body)
         if (!req.body.email || !req.body.password)
             return res.json({ message: "plese enter email and password" });
         const userExist = await User.findOne({
             email: req.body.email
         }).select('+password');
         if (!userExist || !await userExist.checkPassword(req.body.password, userExist.password)) return res.json({ message: "incorrect email or password" })
-        createAndSendToken("login successfully", { email: userExist.email }, res)
+        createAndSendToken("login successfully", userExist, res)
         // response("login successfully", userExist, 200, res);
     } catch (error) {
         res.json({
@@ -75,5 +87,8 @@ exports.userlogin = async (req, res) => {
         });
     }
 };
+
+
+
 
 
